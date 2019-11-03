@@ -42,12 +42,12 @@ Minden az eredeti fájlban lévö karakterekhez hozzárendel egy egyértelmü hu
 
 #### Példa
 
-example.txt fájl tartalma:
+`example.txt` fájl tartalma:
 ```
 aabacdab
 ```
 
-Kódtáblázat:
+`huffman_example.txt` fájl tartalma:
 ```
 a: 0
 b: 10
@@ -55,12 +55,12 @@ c: 110
 d: 111
 ```
 
-tiny_example.txt fájl tartalma:
+`tiny_example.txt` fájl tartalma:
 ```
 	00100110111010
 ```
 
-A kódtáblázatban levő kódszavak prefix kódot alkotnak, azaz egyik kódszó nem kezdödik egy másikkal.
+A kódtáblázatban levő kódszavak prefix kódot alkotnak, azaz egyik kódszó sem kezdödik egy másikkal.
 
 példa **nem** prefix kódra:
 ```
