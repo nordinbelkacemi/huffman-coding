@@ -57,14 +57,14 @@ d: 111
 
 `tiny_example.txt` fájl tartalma:
 ```
-	00100110111010
+00100110111010
 ```
 
 A kódtáblázatban levő kódszavak prefix kódot alkotnak, azaz egyik kódszó sem kezdödik egy másikkal.
 
 példa **nem** prefix kódra:
 ```
-	a: 0
-	b: 01
+a: 0
+b: 01
 ```
 A `b` kódszó `a`-val kezdödik, vagyis ez nem prefix kód.
