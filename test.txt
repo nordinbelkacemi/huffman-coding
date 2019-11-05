@@ -1,0 +1,22 @@
+#if BITS == 14
+ # define HSIZE18013/* 91% occupancy */
+ #endif
+ #if BITS == 13
+ # define HSIZE9001/* 91% occupancy */
+ #endif
+ #if BITS <= 12
+ # define HSIZE5003/* 80% occupancy */
+ #endif
+
+ #ifdef M_XENIX/* Stupid compiler can't handle¬
+arrays with */
+ # if BITS == 16/* more than 65535 bytes - so we¬
+fake it */
+ # define XENIX_16
+ # else
+ # if BITS > 13/* Code only handles BITS = 12,¬
+13, or 16 */
+ # define BITS13
+ # endif
+ # endif
+ #endif
