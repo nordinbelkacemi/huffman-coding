@@ -187,6 +187,16 @@ Queue *sample(char *filename) {
     return q;
 }
 
+int max(int a, int b) {
+    return a > b ? a : b;
+}
+
+int height(HuffNode *root) {
+    if (root == NULL)
+        return -1;
+    return max(height(root->left), height(root->right)) + 1;
+}
+
 void free_tree(HuffNode *node) {
     if (node == NULL)
         return;
@@ -195,17 +205,23 @@ void free_tree(HuffNode *node) {
     free(node);
 }
 
+void free_mem(Queue *q) {
+    free_tree(q->array[0]);
+    free(q->array);
+    free(q);
+}
+
+
 int main() {
-    Queue *q = sample("test.txt");
+    Queue *q = sample("test2.txt");
     print_queue(q);
 
     while (q->size != 1)
         huffman_reduce(q);
 
     print_queue(q);
-
-    free_tree(q->array[0]);
-    free(q->array);
-    free(q);
+    printf("tree height = %d\n", height(q->array[0]));
+    
+    free_mem(q);
     return 0;
 }
