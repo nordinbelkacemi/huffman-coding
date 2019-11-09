@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "debugmalloc.h"
+#include "debugmalloc-impl.h"
 
 void feed(int *char_freq, char *filename) {
     FILE *f = fopen(filename, "r");
     char c;
-    int total = 0;
     while ((c = fgetc(f)) != EOF) {
         char_freq[c] += 1;
-        total += 1;
     }
-    printf("total characters = %d", total);
     fclose(f);
 }
 
@@ -188,13 +187,25 @@ Queue *sample(char *filename) {
     return q;
 }
 
+void free_tree(HuffNode *node) {
+    if (node == NULL)
+        return;
+    free_tree(node->left);
+    free_tree(node->right);
+    free(node);
+}
+
 int main() {
     Queue *q = sample("test.txt");
     print_queue(q);
-    while (q->size != 1) {
+
+    while (q->size != 1)
         huffman_reduce(q);
-    }
+
     print_queue(q);
-    
+
+    free_tree(q->array[0]);
+    free(q->array);
+    free(q);
     return 0;
 }
