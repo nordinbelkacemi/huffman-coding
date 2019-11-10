@@ -8,6 +8,7 @@
 #include "debugmalloc-impl.h"
 #include "charsampling.h"
 #include "stack.h"
+#include "utility.h"
 
 /* Node of a Huffman tree */
 typedef struct HuffNode {
@@ -26,6 +27,33 @@ typedef struct Queue {
 bool is_leaf(HuffNode *node) {
     return node->left == NULL && node->right == NULL;
 }
+
+/* utility function for debugging purposes */
+void print_node(HuffNode *node) {
+    if (is_leaf(node)) {
+        print_char(node->c);
+        printf("/%d\n", node->freq);
+    }
+    else {
+        printf("%s/%d\n", "internal node", node->freq);
+    }
+}
+
+/* utility function for debugging purposes */
+void print_queue(Queue *q) {
+    printf("\n");
+    for (int i = 0; i < q->size; i++) {
+        if (is_leaf(q->array[i])) {
+            print_char(q->array[i]->c);
+            printf("/%d\n", q->array[i]->freq);
+        }
+        else {
+            printf("%s/%d\n", "internal node", q->array[i]->freq);
+        }
+    }
+    printf("\n");
+}
+
 
 /* allocates memory for the queue and sets its size to 0 */
 Queue *create_queue(int initsize) {
@@ -66,6 +94,7 @@ HuffNode *new_internal_node(Queue *q) {
 
     return parent;
 }
+
 
 /* inserts a newly made Huffman node into the queue, keeping it sorted. */
 void insert(Queue *q, HuffNode *node) {
@@ -118,11 +147,12 @@ void quicksort(Queue *q, int min, int max) {
         quicksort(q, i, max);
 }
 
-/* performs the 2nd step of Huffman's compression algorithm (see documentation) */
+/* performs Huffman's compression algorithm (see documentation) */
 void huffman_reduce(Queue *q) {
     HuffNode *internal_node = new_internal_node(q);
     insert(q, internal_node);
 }
+
 
 /* fills the queue with nodes, each of which contain a character and its frequency in a given text file */
 Queue *sample(char *filename) {
@@ -180,13 +210,8 @@ void free_tree(HuffNode *node) {
 /* prints the encoding of each character node */
 void print_encodings(HuffNode *node, StackNode *stack) {
     if (is_leaf(node)) {
-        if (node->c == '\n')
-            printf("\\n:");
-        else if (node->c == '\t')
-            printf("\\t:");
-        else
-            printf("%c:", node->c);
-        printf("\t");
+        print_char(node->c);
+        printf(":\t");
         print_bits(stack);
         return;
     }
