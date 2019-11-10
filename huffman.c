@@ -2,15 +2,9 @@
 #include "utility.h"
 
 int main() {
-    Queue *q = sample("bible.txt");
-    print_queue(q);
-
-    while (q->size != 1)
-        huffman_reduce(q);
-
-    print_queue(q);
-    printf("tree height = %d\n", height(q->array[0]));
+    HuffNode *huffman_tree = build_huffman_tree("bible.txt");
+    show_huffman_table(huffman_tree);
+    free_tree(huffman_tree);
     
-    free_mem(q);
     return 0;
 }

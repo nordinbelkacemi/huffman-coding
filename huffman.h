@@ -7,15 +7,16 @@
 #include "debugmalloc.h"
 #include "debugmalloc-impl.h"
 #include "charsampling.h"
+#include "stack.h"
 
-/* Huffman (binary) tree node */
+/* Node of a Huffman tree */
 typedef struct HuffNode {
     char c;
     int freq;
     struct HuffNode *left, *right;
 } HuffNode;
 
-/* Queue used to build Huffman Tree */
+/* Element of Queue used to build Huffman Tree */
 typedef struct Queue {
     int initsize, size;
     HuffNode **array;
@@ -130,10 +131,6 @@ Queue *sample(char *filename) {
     int size = character_set_size(char_freq);
 
     Queue *q = create_queue(character_set_size(char_freq));
-    if (q == NULL) {
-        fprintf(stderr, "Error\n");
-        exit(1);
-    }
 
     for (int i = 0; i < 128; i++) {
         if (char_freq[i] != 0) {
@@ -150,15 +147,25 @@ Queue *sample(char *filename) {
     return q;
 }
 
-int max(int a, int b) {
-    return a > b ? a : b;
+/* frees the rest of the memory */
+void free_queue(Queue *q) {
+    free(q->array);
+    free(q);
 }
 
-/* computes the height of the huffman tree */
-int height(HuffNode *root) {
-    if (root == NULL)
-        return -1;
-    return max(height(root->left), height(root->right)) + 1;
+HuffNode *build_huffman_tree(char *filename) {
+    Queue *q = sample(filename);
+
+    while (q->size != 1)
+        huffman_reduce(q);
+
+    /* the first and only element left in the queue is the root of the huffman tree */
+    HuffNode *tree = q->array[0];
+
+    /* free memory */
+    free_queue(q);
+
+    return tree;
 }
 
 /* frees the memory allocated for each node in the huffman tree */
@@ -170,11 +177,33 @@ void free_tree(HuffNode *node) {
     free(node);
 }
 
-/* frees the rest of the memory */
-void free_mem(Queue *q) {
-    free_tree(q->array[0]);
-    free(q->array);
-    free(q);
+/* prints the encoding of each character node */
+void print_encodings(HuffNode *node, StackNode *stack) {
+    if (is_leaf(node)) {
+        if (node->c == '\n')
+            printf("\\n:");
+        else if (node->c == '\t')
+            printf("\\t:");
+        else
+            printf("%c:", node->c);
+        printf("\t");
+        print_bits(stack);
+        return;
+    }
+    stack = push(stack, 0);
+    print_encodings(node->left, stack);
+    stack = pop(stack);
+
+    stack = push(stack, 1);
+    print_encodings(node->right, stack);
+    stack = pop(stack);
+}
+
+/* creates a stack then prints all encodings using the print_encodings function */
+void show_huffman_table(HuffNode *node) {
+    StackNode *stack = init_stack();
+    print_encodings(node, stack);
+    free(stack);
 }
 
 #endif
