@@ -1,13 +1,7 @@
-#include "utility.h"
-
-void print_char(char c) {
-    if (c == '\n')
-        printf("\\n");
-    else if (c == '\t')
-        printf("\\t");
-    else
-        printf("%c", c);
-}
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "huffman.h"
 
 /* unsigned char */
 
@@ -55,12 +49,28 @@ void printbin_int(int n) {
     printf("\n");
 }
 
-/* huffman */
+int main() {
+    // HuffCode h1 = {67784, 20, 't'};
+    // HuffCode h2 = {67782, 20, 't'};
+    // printbin_int(h1.code);
 
-void printbin_huffcode(int code, size_t length) {
-    int sb = sig_bits_int(code);
-    for (int i = length; i > sb; i--)
-        printf("0");
-    printbin_int_recur(code);
-    printf("\n");
+    // FILE *fout = fopen("binary.dat", "wb");
+    // fwrite(&h1.code, sizeof(int), 1, fout);
+    // fwrite(&h2.code, sizeof(int), 1, fout);
+    // fclose(fout);
+
+    // FILE *fin = fopen("binary.dat", "rb");
+    // char buffer[8];
+    // fread(buffer, sizeof(char), 8, fin);
+
+    // for (int i = 0; i < 8; i++)
+    //     printbin(buffer[i]);
+
+    // fclose(fin);
+    int a = 0;
+    a = a << 1;
+    a = a << 1;
+    a = a << 1;
+    printf("%d\n", a);
+    return 0;
 }

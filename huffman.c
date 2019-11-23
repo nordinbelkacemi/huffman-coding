@@ -130,13 +130,13 @@ void huffman_reduce(Queue *q) {
 
 /* fills the queue with nodes, each of which contain a character and its frequency in a given text file */
 Queue *sample(char *filename) {
-    int char_freq[128] = {0};
+    int char_freq[256] = {0};
     feed(char_freq, filename);
     int size = character_set_size(char_freq);
 
     Queue *q = create_queue(size);
 
-    for (int i = 0; i < 128; i++) {
+    for (int i = 0; i < 256; i++) {
         if (char_freq[i] != 0) {
             HuffNode *node = (HuffNode *)malloc(sizeof(HuffNode));
             node->c = i;
@@ -157,9 +157,10 @@ void free_queue(Queue *q) {
     free(q);
 }
 
-/* builds a huffman tree */
-HuffNode *build_huffman_tree(char *filename) {
+/* builds a huffman tree and copies the size of the huffman table into the table_size variable */
+HuffNode *build_huffman_tree(char *filename, size_t *table_size) {
     Queue *q = sample(filename);
+    *table_size = q->size;
 
     while (q->size != 1)
         huffman_reduce(q);
@@ -182,26 +183,97 @@ void free_tree(HuffNode *node) {
     free(node);
 }
 
-/* prints the encoding of each character node */
-void print_encodings(HuffNode *node, StackNode *stack) {
-    if (is_leaf(node)) {
-        print_char(node->c);
-        printf(":\t");
-        print_bits(stack);
-        return;
+/* performs exponentiation on the positive number n, assuming the exponent is also positive or zero */
+int power(int n, int exponent) {
+    if (exponent == 0)
+        return 1;
+    else {
+        int result = n;
+        for (int i = 1; i < exponent; i++)
+            result *= n;
+        return result;
     }
-    stack = push(stack, 0);
-    print_encodings(node->left, stack);
-    stack = pop(stack);
-
-    stack = push(stack, 1);
-    print_encodings(node->right, stack);
-    stack = pop(stack);
 }
 
-/* creates a stack then prints all encodings using the print_encodings function */
-void show_huffman_table(HuffNode *node) {
-    StackNode *stack = init_stack();
-    print_encodings(node, stack);
-    free(stack);
+/* fills huffman table with huffman codes, which are encoded by the path to a leaf node (left = 0, right = 1) */
+void fill_huffman_table(HuffCode *table, size_t *size, HuffNode *node, int code, size_t code_length) {
+    if (is_leaf(node)) {
+        table[*size].character = node->c;
+        table[*size].code = code;
+        table[*size].length = code_length;
+        *size += 1;
+        return;
+    }
+
+    code = code << 1;
+    code_length += 1;
+    fill_huffman_table(table, size, node->left, code, code_length);
+    code = code >> 1;
+    code_length -= 1;
+
+    code = code << 1;
+    code += 1;
+    code_length += 1;
+    fill_huffman_table(table, size, node->right, code, code_length);
+    code = code >> 1;
+    code -= 1;
+    code_length -= 1;
+}
+
+/* prints the encoding of each character */
+void print_huffman_table(HuffCode *table, size_t size) {
+    for (int i = 0; i < size; i++) {
+        print_char(table[i].character);
+        printf(":\t");
+        printbin_huffcode(table[i].code, table[i].length);
+    }
+}
+
+/* allocated memory for the huffman table and fills it */
+HuffCode *build_huffman_table(HuffNode *huffman_tree, size_t table_size) {
+    HuffCode *huffman_table = (HuffCode *)malloc(table_size * sizeof(HuffCode));
+    size_t size = 0;
+    fill_huffman_table(huffman_table, &size, huffman_tree, 0, 0);
+    return huffman_table;
+}
+
+/* swaps two elements of a huffman table */
+void swap_codes(HuffCode *a, HuffCode *b) {
+    HuffCode tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+/* sorts huffman table alphabetically */
+void quicksort_table(HuffCode *table, int min, int max) {
+    HuffCode pivot = table[(min + max) / 2];
+    int i = min, j = max;
+    while (i <= j) {
+        while (table[i].character < pivot.character)
+            i += 1;
+        while (table[j].character > pivot.character)
+            j -= 1;
+        if (i <= j) {
+            swap_codes(&table[i], &table[j]);
+            i += 1;
+            j -= 1;
+        }
+    }
+
+    if (min < j)
+        quicksort_table(table, min, j);
+    if (i < max)
+        quicksort_table(table, i, max);
+}
+
+/* only shows the huffman table for now */
+void compress(char *filename) {
+    size_t table_size;
+    HuffNode *huffman_tree = build_huffman_tree(filename, &table_size);
+    HuffCode *huffman_table = build_huffman_table(huffman_tree, table_size);
+    quicksort_table(huffman_table, 0, table_size - 1);
+    print_huffman_table(huffman_table, table_size);
+
+    free(huffman_table);
+    free_tree(huffman_tree);
 }

@@ -12,5 +12,8 @@
 # ignore .o files
 *.o
 
+# ignore .dat files
+*.dat
+
 # ignore the junk folder
 junk/

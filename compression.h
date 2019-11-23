@@ -5,7 +5,7 @@
 // while character read from text is not EOF:
 //     add huff code of character to the buffer.
 //     if buffer full:
-//         copy overflow into nextbuffer
+//         copy overflow into nextbuffer if needed
 //         write buffer into file
 //         buffer = nextbuffer
 //         clear nextbuffer

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "charsampling.h"
 
 /* fills the char_freq array with the right character frequencies */
@@ -11,6 +12,7 @@ void feed(int *char_freq, char *filename) {
     }
     else {
         perror("File not found");
+        exit(1);
     }
     fclose(f);
 }
@@ -18,7 +20,7 @@ void feed(int *char_freq, char *filename) {
 /* determines how many distinct characters the text file contains. */
 int character_set_size(int *char_freq) {
     int size = 0;
-    for (int i = 0; i < 128; i++)
+    for (int i = 0; i < 256; i++)
         if (char_freq[i] != 0)
             size += 1;
     return size;
