@@ -1,15 +1,11 @@
 // algorithm for writing the binary huffman codes of a text into a file.
 //
-// buffer = {_,_,_,_,_,_,_,_}, nextbuffer = {_,_,_,_,_,_,_,_}
+// buffer as binary: {_,_,...,_} 8 bytes (64 bits)
 //
 // while character read from text is not EOF:
 //     add huff code of character to the buffer.
-//     if buffer full:
-//         copy overflow into nextbuffer if needed
-//         write buffer into file
-//         buffer = nextbuffer
-//         clear nextbuffer
+//     while buffer_size >= 8:
+//         write first byte of the buffer into file
+//         shift the first byte of the buffer out of it
 //
-// // end of file
-// add trailing zeroes to the buffer if needed {1,1,0,1,_,_,_,_} -> {1,1,0,1,0,0,0,0}
-// write buffer into file.
+// write the first byte of the buffer into the file (writes with trailing zeroes)

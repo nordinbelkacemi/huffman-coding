@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "debugmalloc.h"
 #include "debugmalloc-impl.h"
 #include "charsampling.h"
@@ -24,7 +25,7 @@ typedef struct Queue {
 
 /* Huffman code used to write into and read from binary files */
 typedef struct HuffCode {
-    int code;
+    unsigned long code;
     size_t length;
     unsigned char character;
 } HuffCode;
@@ -42,14 +43,23 @@ void quicksort(Queue *q, int min, int max);
 void huffman_reduce(Queue *q);
 Queue *sample(char *filename);
 void free_queue(Queue *q);
-HuffNode *build_huffman_tree(char *filename, size_t *table_size);
+void make_helper(Queue *q, char *filename);
+Queue *get_queue(char *filename);
+HuffNode *build_huffman_tree(char *filename, size_t *table_size, char *mode);
 void free_tree(HuffNode *node);
-int power(int n, int exponent);
-void fill_huffman_table(HuffCode *table, size_t *size, HuffNode *node, int code, size_t code_length);
+void fill_huffman_table(HuffCode *table, size_t *size, HuffNode *node, unsigned long code, size_t code_length);
+void print_huffcode(HuffCode code);
 void print_huffman_table(HuffCode *table, size_t size);
 HuffCode *build_huffman_table(HuffNode *huffman_tree, size_t table_size);
 void swap_codes(HuffCode *a, HuffCode *b);
 void quickort_table(HuffCode *table, int min, int max);
+HuffCode *binsearch(HuffCode *table, size_t n, unsigned char c);
+void add_to_buffer(unsigned long *buffer, size_t *curr_buffsize, HuffCode code);
+void write_buffer(FILE *f, unsigned long *buffer, size_t *curr_buffsize);
+void write_binary(char *filename, HuffCode *huffman_table, size_t table_size);
+void read_compressed(char *filename);
 void compress(char *filename);
+void write_text(char *filename, HuffNode *huffman_tree);
+void decompress(char *filename);
 
 #endif

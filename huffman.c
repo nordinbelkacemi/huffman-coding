@@ -157,10 +157,54 @@ void free_queue(Queue *q) {
     free(q);
 }
 
+/* makes a helper file, which contains all the characters and their frequencies */
+void make_helper(Queue *q, char *filename) {
+    FILE *f = helper_file(filename, "wb");
+    fwrite(&(q->size), sizeof(int), 1, f);
+    for (int i = 0; i < q->size; i++) {
+        fwrite(&(q->array[i]->c), sizeof(char), 1, f);
+        fwrite(&(q->array[i]->freq), sizeof(int), 1, f);
+    }
+    fclose(f);
+}
+
+/* reads in data from binary file to make a queue that will be used to build the huffman tree */
+Queue *get_queue(char *filename) {
+    FILE *f = helper_file(filename, "rb");
+    int size;
+    fread(&size, sizeof(int), 1, f);
+
+    Queue *q = create_queue(size);
+
+    char c;
+    int freq;
+    while (fread(&c, sizeof(char), 1, f) == 1 && fread(&freq, sizeof(int), 1, f) == 1) {
+        HuffNode *node = (HuffNode *)malloc(sizeof(HuffNode));
+        node->c = c;
+        node->freq = freq;
+        node->left = NULL;
+        node->right = NULL;
+        q->array[q->size] = node;
+        q->size += 1;
+    }
+    return q;
+}
+
 /* builds a huffman tree and copies the size of the huffman table into the table_size variable */
-HuffNode *build_huffman_tree(char *filename, size_t *table_size) {
-    Queue *q = sample(filename);
+HuffNode *build_huffman_tree(char *filename, size_t *table_size, char *mode) {
+    Queue *q;
+    if (strcmp(mode, "compression") == 0) {
+        q = sample(filename);
+        printf("queue sampled from text file before compression:\n");
+        make_helper(q, filename);
+    } else {
+        q = get_queue(filename);
+        printf("queue sampled from helper binary before decompression:\n");
+    }
     *table_size = q->size;
+    print_queue(q);
+
+    // print_queue(q);
 
     while (q->size != 1)
         huffman_reduce(q);
@@ -183,20 +227,8 @@ void free_tree(HuffNode *node) {
     free(node);
 }
 
-/* performs exponentiation on the positive number n, assuming the exponent is also positive or zero */
-int power(int n, int exponent) {
-    if (exponent == 0)
-        return 1;
-    else {
-        int result = n;
-        for (int i = 1; i < exponent; i++)
-            result *= n;
-        return result;
-    }
-}
-
 /* fills huffman table with huffman codes, which are encoded by the path to a leaf node (left = 0, right = 1) */
-void fill_huffman_table(HuffCode *table, size_t *size, HuffNode *node, int code, size_t code_length) {
+void fill_huffman_table(HuffCode *table, size_t *size, HuffNode *node, unsigned long code, size_t code_length) {
     if (is_leaf(node)) {
         table[*size].character = node->c;
         table[*size].code = code;
@@ -220,13 +252,17 @@ void fill_huffman_table(HuffCode *table, size_t *size, HuffNode *node, int code,
     code_length -= 1;
 }
 
+/* prints huffcode with corresponding character */
+void print_huffcode(HuffCode code) {
+    print_char(code.character);
+    printf(":\t");
+    printbin_huffcode(code.code, code.length);
+}
+
 /* prints the encoding of each character */
 void print_huffman_table(HuffCode *table, size_t size) {
-    for (int i = 0; i < size; i++) {
-        print_char(table[i].character);
-        printf(":\t");
-        printbin_huffcode(table[i].code, table[i].length);
-    }
+    for (int i = 0; i < size; i++)
+        print_huffcode(table[i]);
 }
 
 /* allocated memory for the huffman table and fills it */
@@ -266,14 +302,125 @@ void quicksort_table(HuffCode *table, int min, int max) {
         quicksort_table(table, i, max);
 }
 
+/* searches the  huffman code of a given character in a huffman table */
+HuffCode *binsearch(HuffCode *table, size_t n, unsigned char c) {
+    int l = 0;
+    int r = n - 1;
+    while (l <= r) {
+        int m = (l + r) / 2;
+        if (table[m].character < c)
+            l = m + 1;
+        else if (table[m].character > c)
+            r = m - 1;
+        else
+            return &table[m];
+    }
+    return NULL;
+}
+
+/* appends a code to the buffer */
+void add_to_buffer(unsigned long *buffer, size_t *curr_buffsize, HuffCode code) {
+    code.code = code.code << (8 * sizeof(unsigned long) - code.length - *curr_buffsize);
+    *buffer = *buffer | code.code;
+    *curr_buffsize += code.length;
+}
+
+/* writes the first byte of the buffer into a file */
+void write_buffer(FILE *f, unsigned long *buffer, size_t *curr_buffsize) {
+    unsigned char data = *buffer >> (sizeof(unsigned long) * 8 - sizeof(unsigned char) * 8);
+    fwrite(&data, sizeof(unsigned char), 1, f);
+    *buffer = *buffer << 8;
+    *curr_buffsize -= 8;
+}
+
+/* writes the binary file */
+void write_binary(char *filename, HuffCode *huffman_table, size_t table_size) {
+    FILE *fout = comp_file(filename, "wb");
+    FILE *fin = fopen(filename, "r");
+
+    unsigned long buffer = 0;
+    size_t curr_buffsize = 0;
+    
+    int c;
+    while ((c = fgetc(fin)) != EOF) {
+        unsigned char chr = c;
+        HuffCode *code = binsearch(huffman_table, table_size, chr);
+        add_to_buffer(&buffer, &curr_buffsize, *code);
+        while (curr_buffsize >= 8)
+            write_buffer(fout, &buffer, &curr_buffsize);
+    }
+
+    curr_buffsize = 8;
+    write_buffer(fout, &buffer, &curr_buffsize);
+    fclose(fout);
+    fclose(fin);
+}
+
+/* reads the contents of binary file (for checking purposes) */
+void read_compressed(char *filename) {
+    FILE *f = comp_file(filename, "rb");
+    unsigned char bfr;
+    while (fread(&bfr, sizeof(unsigned char), 1, f) == 1)
+        printbin(bfr);
+    fclose(f);
+}
+
 /* only shows the huffman table for now */
 void compress(char *filename) {
     size_t table_size;
-    HuffNode *huffman_tree = build_huffman_tree(filename, &table_size);
+    HuffNode *huffman_tree = build_huffman_tree(filename, &table_size, "compression");
     HuffCode *huffman_table = build_huffman_table(huffman_tree, table_size);
     quicksort_table(huffman_table, 0, table_size - 1);
-    print_huffman_table(huffman_table, table_size);
 
+    // print_huffman_table(huffman_table, table_size);
+    write_binary(filename, huffman_table, table_size);
+
+    // read_compressed(filename);
+
+    free(huffman_table);
+    free_tree(huffman_tree);
+}
+
+void write_text(char *filename, HuffNode *huffman_tree) {
+    FILE *fout = restored_file(filename);
+    FILE *fin = comp_file(filename, "rb");
+
+    HuffNode *root = huffman_tree;
+    HuffNode *p = root;
+    int chars_to_write = root->freq;
+    int chars_written = 0;
+    int buffer_size;
+
+    unsigned char buffer;
+
+    while (fread(&buffer, sizeof(unsigned char), 1, fin) == 1) {
+        buffer_size = 8;
+        while (buffer_size != 0 && chars_written != chars_to_write) {
+            // printbin(buffer);
+            int step = buffer / power(2, sizeof(unsigned char) * 8 - 1);
+            buffer = buffer << 1;
+            buffer_size -= 1;
+            if (step == 0)
+                p = p->left;
+            else
+                p = p->right;
+            if (is_leaf(p)) {
+                fputc(p->c, fout);
+                // printf("%c\n", p->c);
+                chars_written += 1;
+                p = root;
+            }
+        }
+    }
+}
+
+void decompress(char *filename) {
+    size_t table_size;
+    HuffNode *huffman_tree = build_huffman_tree(filename, &table_size, "decompression");
+    HuffCode *huffman_table = build_huffman_table(huffman_tree, table_size);
+    print_huffman_table(huffman_table, table_size);
+    // print_node(huffman_tree);
+    write_text(filename, huffman_tree);
     free(huffman_table);
     free_tree(huffman_tree);
 }

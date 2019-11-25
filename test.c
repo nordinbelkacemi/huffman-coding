@@ -3,55 +3,32 @@
 #include <math.h>
 #include "huffman.h"
 
-/* unsigned char */
-
-int sig_bits(unsigned char c) {
-    return (c != 0) ? (int)log2((double)c) + 1 : 0;
-}
-
-void printbin_recur(unsigned char c) {
-    if (c == 0)
-        return;
-    else {
-        printbin_recur(c / 2);
-        printf("%d", c % 2 == 0 ? 0 : 1);
+HuffCode *binsearch_huffcode(HuffCode *table, size_t n, char c) {
+    int l = 0;
+    int r = n - 1;
+    while (l <= r) {
+        int m = (l + r) / 2;
+        if (table[m].character < c)
+            l = m + 1;
+        else if (table[m].character > c)
+            r = m - 1;
+        else
+            return &table[m];
     }
+    return NULL;
 }
 
-void printbin(unsigned char c) {
-    int sb = sig_bits(c);
-    for (int i = 8 * sizeof(unsigned char); i > sb; i--)
-        printf("0");
-    printbin_recur(c);
-    printf("\n");
-}
-
-/* int */
-
-int sig_bits_int(int n) {
-    return (n != 0) ? (int)log2((double)n) + 1 : 0;
-}
-
-void printbin_int_recur(int n) {
-    if (n == 0)
-        return;
-    else {
-        printbin_int_recur(n / 2);
-        printf("%d", n % 2 == 0 ? 0 : 1);
-    }
-}
-
-void printbin_int(int n) {
-    int sb = sig_bits_int(n);
-    for (int i = 8 * sizeof(int); i > sb; i--)
-        printf("0");
-    printbin_int_recur(n);
-    printf("\n");
+/* appends a code to the buffer */
+void add_to_buffer(unsigned long *buffer, size_t *curr_buffsize, HuffCode code) {
+    code.code = code.code << (8 * sizeof(unsigned long) - code.length - *curr_buffsize);
+    *buffer = *buffer | code.code;
+    *curr_buffsize += code.length;
 }
 
 int main() {
-    // HuffCode h1 = {67784, 20, 't'};
-    // HuffCode h2 = {67782, 20, 't'};
+    HuffCode h1 = {67784, 17, 't'};
+    HuffCode h2 = {17, 5, 't'};
+    HuffCode h3 = {7 << 1, 4, 'y'};
     // printbin_int(h1.code);
 
     // FILE *fout = fopen("binary.dat", "wb");
@@ -67,10 +44,25 @@ int main() {
     //     printbin(buffer[i]);
 
     // fclose(fin);
-    int a = 0;
-    a = a << 1;
-    a = a << 1;
-    a = a << 1;
-    printf("%d\n", a);
+    unsigned long buffer = 0;
+    size_t curr_buffsize = 0;
+
+    printf("code:\t");
+    printbin_ul(h1.code);
+    add_to_buffer(&buffer, &curr_buffsize, h1);
+    printf("\t");
+    printbin_ul(buffer);
+
+    printf("code:\t");
+    printbin_ul(h2.code);
+    add_to_buffer(&buffer, &curr_buffsize, h2);
+    printf("\t");
+    printbin_ul(buffer);
+
+    printf("code:\t");
+    printbin_ul(h3.code);
+    add_to_buffer(&buffer, &curr_buffsize, h3);
+    printf("\t");
+    printbin_ul(buffer);
     return 0;
 }
