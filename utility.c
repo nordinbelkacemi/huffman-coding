@@ -1,4 +1,5 @@
 #include "utility.h"
+#include "econio.h"
 
 void print_char(char c) {
     if (c == '\n')
@@ -56,7 +57,6 @@ void printbin_ul(unsigned long n) {
 }
 
 /* huffman */
-
 void printbin_huffcode(unsigned long code, size_t length) {
     int sb = sig_bits_ul(code);
     for (int i = length; i > sb; i--)
@@ -64,8 +64,6 @@ void printbin_huffcode(unsigned long code, size_t length) {
     printbin_ul_recur(code);
     printf("\n");
 }
-
-/* file streams with the correct file names */
 
 /* copies the filename without the extension */
 void cpy_wo_ext(char *dest, char *filename) {
@@ -79,6 +77,7 @@ char *name_wo_pref(char *filename) {
     return strchr(filename, '_') + 1;
 }
 
+/* file stream of the compressed file */
 FILE *comp_file(char *filename, char *mode) {
     if (strcmp(mode, "wb") == 0) {
         char s[101];
@@ -89,11 +88,11 @@ FILE *comp_file(char *filename, char *mode) {
         strcat(name, ".dat");
         return fopen(name, mode);
     } else {
-        printf("file name: %s\n", filename);
         return fopen(filename, mode);
     }
 }
 
+/* file stream of the helper file */
 FILE *helper_file(char *filename, char *mode) {
     char s[101];
     if (strcmp(mode, "wb") == 0)
@@ -108,6 +107,7 @@ FILE *helper_file(char *filename, char *mode) {
     return fopen(name, mode);
 }
 
+/* file stream of the restored file */
 FILE *restored_file(char *filename) {
     char str[110];
     cpy_wo_ext(str, filename);
@@ -129,4 +129,56 @@ int power(int n, int exp) {
         result *= n;
 
     return result;
+}
+
+/* gets file size */
+long int file_size(FILE *f) {
+    fseek(f, 0L, SEEK_END);
+    long int size = ftell(f);
+    rewind(f);
+    return size;
+}
+
+/* validates filename (txt) */
+bool is_txt(char *filename) {
+    char *p = strchr(filename, '.');
+    if (p == NULL)
+        return false;
+    else
+        return strcmp(p, ".txt") == 0;
+}
+
+/* validates filename (dat) */
+bool is_dat(char *filename) {
+    char *p = strchr(filename, '.');
+    if (p == NULL)
+        return false;
+    else
+        return strcmp(p, ".dat") == 0;
+}
+
+/* prints all information about the usage of the program */
+void print_usage() {
+    printf("Usage:");
+
+    printf("\n\n");
+
+    econio_textcolor(COL_GREEN);
+    printf("\t./main compress file.txt\n");
+    printf("\t./main restore tiny_file.dat");
+    econio_textcolor(COL_RESET);
+
+    printf("\n\n");
+
+    printf("when compressing a file, ");
+    econio_textcolor(COL_GREEN);
+    printf("file.txt ");
+    econio_textcolor(COL_RESET);
+    printf("must be a text file (.txt)\n");
+
+    printf("when restoring a file, ");
+    econio_textcolor(COL_GREEN);
+    printf("tiny_file.dat ");
+    econio_textcolor(COL_RESET);
+    printf("must be a binary file (.dat)\n");
 }

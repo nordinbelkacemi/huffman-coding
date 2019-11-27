@@ -15,5 +15,11 @@
 # ignore .dat files
 *.dat
 
+# ignore restore.txt files
+*restored.txt
+
+# ignore huge file
+huge.txt
+
 # ignore the junk folder
 junk/
