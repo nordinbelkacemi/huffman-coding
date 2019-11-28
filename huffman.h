@@ -12,7 +12,7 @@
 
 /* Node of a Huffman tree */
 typedef struct HuffNode {
-    char c;
+    unsigned char c;
     int freq;
     struct HuffNode *left, *right;
 } HuffNode;

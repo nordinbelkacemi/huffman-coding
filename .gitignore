@@ -21,5 +21,7 @@
 # ignore huge file
 huge.txt
 
+# ignore chinese file
+
 # ignore the junk folder
 junk/
