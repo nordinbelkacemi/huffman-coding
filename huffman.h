@@ -37,6 +37,5 @@ void free_tree(HuffNode *node);
 HuffCode *build_huffman_table(HuffNode *huffman_tree, size_t table_size);
 void quicksort_table(HuffCode *table, int min, int max);
 HuffCode *binsearch(HuffCode *table, size_t n, unsigned char c);
-// void print_huffman_table(HuffCode *table, size_t size);
 
 #endif

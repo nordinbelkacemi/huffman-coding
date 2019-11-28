@@ -60,6 +60,11 @@ void read_compressed(char *filename) {
 
 /* takes in a file's name and compresses it into a binary file */
 void compress(char *filename) {
+    if (fopen(filename, "r") == NULL){
+        perror("File not found");
+        exit(1);
+    }
+
     size_t table_size;
     HuffNode *huffman_tree = build_huffman_tree(filename, &table_size, "compression");
     HuffCode *huffman_table = build_huffman_table(huffman_tree, table_size);
@@ -101,10 +106,18 @@ void write_text(char *filename, HuffNode *huffman_tree) {
             }
         }
     }
+
+    fclose(fin);
+    fclose(fout);
 }
 
 /* restores the compressed file back to its original state */
 void restore(char *filename) {
+    if (fopen(filename, "rb") == NULL) {
+        perror("File not found");
+        exit(1);
+    }
+
     size_t table_size;
     HuffNode *huffman_tree = build_huffman_tree(filename, &table_size, "restore");
     HuffCode *huffman_table = build_huffman_table(huffman_tree, table_size);

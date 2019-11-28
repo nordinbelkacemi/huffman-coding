@@ -15,14 +15,14 @@ int main(int argc, char *argv[]) {
                 print_usage();
                 return 3;
             }
-        } else if (strcmp(mode, "restore") == 0)
+        } else if (strcmp(mode, "restore") == 0) {
             if (is_dat(filename))
                 restore(filename);
             else {
                 print_usage();
                 return 3;
             }
-        else {
+        } else {
             print_usage();
             return 2;
         }

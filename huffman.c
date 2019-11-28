@@ -196,9 +196,9 @@ HuffNode *build_huffman_tree(char *filename, size_t *table_size, char *mode) {
     if (strcmp(mode, "compression") == 0) {
         q = sample(filename);
         make_helper(q, filename);
-    } else {
+    } else
         q = get_queue(filename);
-    }
+
     *table_size = q->size;
 
     while (q->size != 1)

@@ -4,16 +4,10 @@
 /* fills the char_freq array with the right character frequencies */
 void feed(int *char_freq, char *filename) {
     FILE *f = fopen(filename, "r");
-    if (f != NULL) {
-        int c;
-        while ((c = fgetc(f)) != EOF) {
-            char_freq[c] += 1;
-        }
-    }
-    else {
-        perror("File not found");
-        exit(1);
-    }
+    int c;
+    while ((c = fgetc(f)) != EOF)
+        char_freq[c] += 1;
+        
     fclose(f);
 }
 

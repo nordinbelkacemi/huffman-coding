@@ -1,6 +1,7 @@
 #include "utility.h"
 #include "econio.h"
 
+/* prints newline and tab characters as "\n" and "\t" */
 void print_char(char c) {
     if (c == '\n')
         printf("\\n");
@@ -10,7 +11,7 @@ void print_char(char c) {
         printf("%c", c);
 }
 
-/* unsigned char */
+/* printing the 8 bit binary representation of an unsigned char c */
 
 int sig_bits(unsigned char c) {
     return (c != 0) ? (int)log2((double)c) + 1 : 0;
@@ -33,7 +34,7 @@ void printbin(unsigned char c) {
     printf("\n");
 }
 
-/* int */
+/* printing the 64 bit binary representation of an unsigned long */
 
 int sig_bits_ul(unsigned long n) {
     return (n != 0) ? (int)log2((double)n) + 1 : 0;
@@ -56,7 +57,7 @@ void printbin_ul(unsigned long n) {
     printf("\n");
 }
 
-/* huffman */
+/* prints the 64 bit representation of a huffman code */
 void printbin_huffcode(unsigned long code, size_t length) {
     int sb = sig_bits_ul(code);
     for (int i = length; i > sb; i--)
@@ -69,16 +70,23 @@ void printbin_huffcode(unsigned long code, size_t length) {
 void cpy_wo_ext(char *dest, char *filename) {
     strcpy(dest, filename);
     char *p = strchr(dest, '.');
-    *p = '\0';
+    if (p != NULL)
+        *p = '\0';
 }
 
 /* filename without the "tiny_" prefix */
 char *name_wo_pref(char *filename) {
-    return strchr(filename, '_') + 1;
+    char *p = strchr(filename, '_');
+    if (p != NULL)
+        return p + 1;
+    else
+        return filename;
 }
 
 /* file stream of the compressed file */
 FILE *comp_file(char *filename, char *mode) {
+    FILE *f;
+
     if (strcmp(mode, "wb") == 0) {
         char s[101];
         char name[110];
@@ -86,10 +94,11 @@ FILE *comp_file(char *filename, char *mode) {
         strcpy(name, "tiny_");
         strcat(name, s);
         strcat(name, ".dat");
-        return fopen(name, mode);
-    } else {
-        return fopen(filename, mode);
-    }
+        f = fopen(name, mode);
+    } else
+        f = fopen(filename, mode);
+    
+    return f;
 }
 
 /* file stream of the helper file */
@@ -97,14 +106,16 @@ FILE *helper_file(char *filename, char *mode) {
     char s[101];
     if (strcmp(mode, "wb") == 0)
         cpy_wo_ext(s, filename);
-    else
+    else {
         cpy_wo_ext(s, name_wo_pref(filename));
+    }
 
     char name[112];
     strcpy(name, s);
     strcat(name, "_helper.dat");
 
-    return fopen(name, mode);
+    FILE *f = fopen(name, mode);
+    return f;
 }
 
 /* file stream of the restored file */

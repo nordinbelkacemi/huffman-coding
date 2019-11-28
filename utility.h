@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "debugmalloc.h"
 
+/* for debugging */
 void print_char(char c);
 void printbin(unsigned char c);
 void printbin_huffcode(unsigned long code, size_t length);
@@ -16,13 +17,11 @@ FILE *comp_file(char *filename, char *mode);
 FILE *helper_file(char *filename, char *mode);
 FILE *restored_file(char *filename);
 
+/* other utility functions */
 long int file_size(FILE *f);
 bool is_txt(char *filename);
 bool is_dat(char *filename);
-
-/* for checking the first bit of the buffer */
 int power(int n, int exp);
-
 void print_usage();
 
 #endif
