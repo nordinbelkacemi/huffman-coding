@@ -8,22 +8,23 @@
 #include "debugmalloc.h"
 #include "econio.h"
 
-/* for debugging */
-void print_char(char c);
-void printbin(unsigned char c);
-void printbin_huffcode(unsigned long code, size_t length);
-
-/* for opening files */
+/* file handling */
 FILE *comp_file(char *filename, char *mode);
 FILE *helper_file(char *filename, char *mode);
 FILE *restored_file(char *filename, char *mode);
 FILE *orig_file(char *filename);
 
-/* other utility functions */
 long int file_size(FILE *f);
 bool is_txt(char *filename);
 bool is_dat(char *filename);
+
+/* other utility functions */
 int power(int n, int exp);
 void print_usage();
+
+/* for debugging */
+void print_char(char c);
+void printbin(unsigned char c);
+void printbin_huffcode(unsigned long code, size_t length);
 
 #endif
