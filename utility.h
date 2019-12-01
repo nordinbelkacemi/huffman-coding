@@ -15,7 +15,8 @@ void printbin_huffcode(unsigned long code, size_t length);
 /* for opening files */
 FILE *comp_file(char *filename, char *mode);
 FILE *helper_file(char *filename, char *mode);
-FILE *restored_file(char *filename);
+FILE *restored_file(char *filename, char *mode);
+FILE *orig_file(char *filename);
 
 /* other utility functions */
 long int file_size(FILE *f);

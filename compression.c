@@ -78,7 +78,7 @@ void compress(char *filename) {
 
 /* writes characters into the restored text file */
 void write_text(char *filename, HuffNode *huffman_tree) {
-    FILE *fout = restored_file(filename);
+    FILE *fout = restored_file(filename, "w");
     FILE *fin = comp_file(filename, "rb");
 
     HuffNode *root = huffman_tree;
@@ -126,4 +126,28 @@ void restore(char *filename) {
 
     free(huffman_table);
     free_tree(huffman_tree);
+}
+
+/* compares the contents of two file streams */
+void compare(FILE *a, FILE *b) {
+    int c1, c2;
+    while ((c1 = fgetc(a)) != EOF && (c2 = fgetc(b)) != EOF) {
+        if (c1 != c2) {
+            econio_textcolor(COL_RED);
+            printf("Failed: The restored file does not match the original file!\n");
+            econio_textcolor(COL_RESET);
+            return;
+        }
+    }
+    econio_textcolor(COL_GREEN);
+    printf("Success: The restored file matches the original file!\n");
+    econio_textcolor(COL_RESET);
+}
+
+/* verifies if the original and the restored files match */
+void verify(char *filename) {
+    FILE *original = orig_file(filename);
+    FILE *restored = restored_file(filename, "r");
+
+    compare(original, restored);
 }

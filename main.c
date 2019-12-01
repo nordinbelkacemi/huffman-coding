@@ -16,8 +16,10 @@ int main(int argc, char *argv[]) {
                 return 3;
             }
         } else if (strcmp(mode, "restore") == 0) {
-            if (is_dat(filename))
+            if (is_dat(filename)) {
                 restore(filename);
+                verify(filename);
+            }
             else {
                 print_usage();
                 return 3;

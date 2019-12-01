@@ -119,7 +119,7 @@ FILE *helper_file(char *filename, char *mode) {
 }
 
 /* file stream of the restored file */
-FILE *restored_file(char *filename) {
+FILE *restored_file(char *filename, char *mode) {
     char str[110];
     cpy_wo_ext(str, filename);
     char *s = strchr(str, '_') + 1;
@@ -128,7 +128,19 @@ FILE *restored_file(char *filename) {
     strcpy(name, s);
     strcat(name, "_restored.txt");
 
-    return fopen(name, "w");
+    FILE *f = fopen(name, mode);
+    return f;
+}
+
+/* file stream of the original file (the filename string passed in will always 
+start with "tiny_" and end in ".dat") */
+FILE *orig_file(char *filename) {
+    char name[105];
+    char *p = strchr(filename, '_') + 1;
+    cpy_wo_ext(name, p);
+    strcat(name, ".txt");
+    FILE *f = fopen(name, "r");
+    return f;
 }
 
 /* computes n to the power of exp, assuming n and exp are positive integers */
