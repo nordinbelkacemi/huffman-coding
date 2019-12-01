@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "debugmalloc.h"
+#include "econio.h"
 
 /* for debugging */
 void print_char(char c);

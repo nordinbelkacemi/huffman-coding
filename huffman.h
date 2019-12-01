@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "econio.h"
 #include "debugmalloc.h"
 #include "charsampling.h"
 #include "utility.h"

@@ -1,8 +1,9 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 
+#include "debugmalloc.h"
 #include "huffman.h"
-#include "file-compare.h"
+#include "econio.h"
 
 void compress(char *filename);
 void restore(char *filename);

@@ -1,5 +1,4 @@
 #include "compression.h"
-#include "utility.h"
 
 /* appends a code to the buffer */
 void add_to_buffer(unsigned long *buffer, size_t *curr_buffsize, HuffCode code) {
