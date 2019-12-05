@@ -66,8 +66,8 @@ FILE *restored_file(char *filename, char *mode) {
     return f;
 }
 
-/* file stream of the original file (the filename string passed in will always 
-start with "tiny_" and end in ".dat") */
+/* file stream of the original file (provided the filename string passed in 
+starts with "tiny_" and ends in ".dat") */
 FILE *orig_file(char *filename) {
     char name[105];
     char *p = strchr(filename, '_') + 1;
@@ -139,69 +139,4 @@ int power(int n, int exp) {
         result *= n;
 
     return result;
-}
-
-/* prints newline and tab characters as "\n" and "\t" */
-void print_char(char c) {
-    if (c == '\n')
-        printf("\\n");
-    else if (c == '\t')
-        printf("\\t");
-    else
-        printf("%c", c);
-}
-
-/* printing the 8 bit binary representation of an unsigned char c */
-
-int sig_bits(unsigned char c) {
-    return (c != 0) ? (int)log2((double)c) + 1 : 0;
-}
-
-void printbin_recur(unsigned char c) {
-    if (c == 0)
-        return;
-    else {
-        printbin_recur(c / 2);
-        printf("%d", c % 2 == 0 ? 0 : 1);
-    }
-}
-
-void printbin(unsigned char c) {
-    int sb = sig_bits(c);
-    for (int i = 8 * sizeof(unsigned char); i > sb; i--)
-        printf("0");
-    printbin_recur(c);
-    printf("\n");
-}
-
-/* printing the 64 bit binary representation of an unsigned long */
-
-int sig_bits_ul(unsigned long n) {
-    return (n != 0) ? (int)log2((double)n) + 1 : 0;
-}
-
-void printbin_ul_recur(unsigned long n) {
-    if (n == 0)
-        return;
-    else {
-        printbin_ul_recur(n / 2);
-        printf("%d", n % 2 == 0 ? 0 : 1);
-    }
-}
-
-void printbin_ul(unsigned long n) {
-    int sb = sig_bits_ul(n);
-    for (int i = 8 * sizeof(unsigned long); i > sb; i--)
-        printf("0");
-    printbin_ul_recur(n);
-    printf("\n");
-}
-
-/* prints the 64 bit representation of a huffman code */
-void printbin_huffcode(unsigned long code, size_t length) {
-    int sb = sig_bits_ul(code);
-    for (int i = length; i > sb; i--)
-        printf("0");
-    printbin_ul_recur(code);
-    printf("\n");
 }

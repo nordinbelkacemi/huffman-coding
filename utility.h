@@ -22,9 +22,4 @@ bool is_dat(char *filename);
 int power(int n, int exp);
 void print_usage();
 
-/* for debugging */
-void print_char(char c);
-void printbin(unsigned char c);
-void printbin_huffcode(unsigned long code, size_t length);
-
 #endif

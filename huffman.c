@@ -5,32 +5,6 @@ bool is_leaf(HuffNode *node) {
     return node->left == NULL && node->right == NULL;
 }
 
-/* utility function for debugging purposes */
-void print_node(HuffNode *node) {
-    if (is_leaf(node)) {
-        print_char(node->c);
-        printf("/%d\n", node->freq);
-    }
-    else {
-        printf("%s/%d\n", "internal node", node->freq);
-    }
-}
-
-/* utility function for debugging purposes */
-void print_queue(Queue *q) {
-    printf("\n");
-    for (int i = 0; i < q->size; i++) {
-        if (is_leaf(q->array[i])) {
-            print_char(q->array[i]->c);
-            printf("/%d\n", q->array[i]->freq);
-        }
-        else {
-            printf("%s/%d\n", "internal node", q->array[i]->freq);
-        }
-    }
-    printf("\n");
-}
-
 /* allocates memory for the queue and sets its size to 0 */
 Queue *create_queue(int initsize) {
     Queue *q = (Queue *)malloc(sizeof(Queue));
@@ -245,19 +219,6 @@ void fill_huffman_table(HuffCode *table, size_t *size, HuffNode *node, unsigned 
     code = code >> 1;
     code -= 1;
     code_length -= 1;
-}
-
-/* prints huffcode with corresponding character */
-void print_huffcode(HuffCode code) {
-    print_char(code.character);
-    printf(":\t");
-    printbin_huffcode(code.code, code.length);
-}
-
-/* prints the encoding of each character */
-void print_huffman_table(HuffCode *table, size_t size) {
-    for (int i = 0; i < size; i++)
-        print_huffcode(table[i]);
 }
 
 /* allocated memory for the huffman table and fills it */

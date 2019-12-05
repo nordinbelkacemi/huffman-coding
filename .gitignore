@@ -18,6 +18,9 @@
 # ignore restore.txt files
 *restored.txt
 
+# ignore big file
+big.txt
+
 # ignore huge file
 huge.txt
 

@@ -48,15 +48,6 @@ void write_binary(char *filename, HuffCode *huffman_table, size_t table_size) {
     fclose(fin);
 }
 
-/* reads the contents of binary file (for checking purposes) */
-void read_compressed(char *filename) {
-    FILE *f = comp_file(filename, "rb");
-    unsigned char bfr;
-    while (fread(&bfr, sizeof(unsigned char), 1, f) == 1)
-        printbin(bfr);
-    fclose(f);
-}
-
 /* takes in a file's name and compresses it into a binary file */
 void compress(char *filename) {
     if (fopen(filename, "r") == NULL){
