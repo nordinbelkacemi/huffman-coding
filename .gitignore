@@ -18,14 +18,18 @@
 # ignore restore.txt files
 *restored.txt
 
-# ignore big file
+# ignore these files
 big.txt
-
-# ignore huge file
 huge.txt
+emojis2.txt
+infoc.txt
 
-# ignore chinese file
-chinese.txt
+
+#ignore test files
+pg*.txt
 
 # ignore the junk folder
 junk/
+
+#ignore graphviz file
+*.gv

@@ -147,7 +147,6 @@ Queue *get_queue(char *filename) {
     FILE *f = helper_file(filename, "rb");
     int size;
     fread(&size, sizeof(int), 1, f);
-
     Queue *q = create_queue(size);
 
     char c;
@@ -174,7 +173,7 @@ HuffNode *build_huffman_tree(char *filename, size_t *table_size, char *mode) {
         q = get_queue(filename);
 
     *table_size = q->size;
-
+    
     while (q->size != 1)
         huffman_reduce(q);
 
@@ -272,4 +271,58 @@ HuffCode *binsearch(HuffCode *table, size_t n, unsigned char c) {
             return &table[m];
     }
     return NULL;
+}
+
+void print_links(FILE *f, HuffNode *root) {
+    if (is_leaf(root)){
+        return;
+    } else {
+        if (is_leaf(root->left)) {
+            fprintf(f, "node%p->", root);
+            fprint_ascii_name(f, root->left->c);
+            fprintf(f, " [label=%d];\n\t", 0);
+        } else {
+            fprintf(f, "node%p->node%p [label=%d]\n\t", root, root->left, 0);
+            print_links(f, root->left);
+        }
+
+        if (is_leaf(root->right)) {
+            fprintf(f, "node%p->", root);
+            fprint_ascii_name(f, root->right->c);
+            fprintf(f, " [label=%d];\n\t", 1);
+        } else {
+            fprintf(f, "node%p->node%p [label=%d]\n\t", root, root->right, 1);
+            print_links(f, root->right);
+        }
+    }
+}
+
+void init_gv_vars(FILE *f, HuffNode *root, HuffCode *table, size_t size) {
+    if (is_leaf(root)) {
+        fprintf(f, "\t");
+        fprint_ascii_name(f, root->c);
+        fprintf(f, "[shape = record, style = filled, fillcolor = lightcyan, label = \"{{'");
+        fprint_char(f, root->c);
+        fprintf(f, "'|%d}|", root->freq);
+        HuffCode *code = binsearch(table, size, root->c);
+        fprintbin(f, code->code, code->length);
+        fprintf(f, "}\"];\n");
+        return;
+    }
+    fprintf(f, "\tnode%p [label = %d];\n", root, root->freq);
+    init_gv_vars(f, root->left, table, size);
+    init_gv_vars(f, root->right, table, size);
+}
+
+void draw_tree(HuffNode *root, HuffCode *table, size_t size) {
+    FILE *f = fopen("htree.gv", "w");
+    fprintf(f, "digraph G {\n");
+    init_gv_vars(f, root, table, size);
+    fprintf(f, "\t");
+    
+    if (is_leaf(root))
+        fprint_ascii_name(f, root->c);
+    else
+        print_links(f, root);
+    fprintf(f, "}");
 }

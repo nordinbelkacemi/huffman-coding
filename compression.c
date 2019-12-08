@@ -21,9 +21,10 @@ void write_binary(char *filename, HuffCode *huffman_table, size_t table_size) {
     FILE *fin = fopen(filename, "r");
 
     econio_textcolor(COL_RED);
-    printf("%ld bytes", file_size(fin));
+    pretty_print(file_size(fin));
+    printf(" bytes ");
     econio_textcolor(COL_RESET);
-    printf(" -> ");
+    printf("-> ");
 
     unsigned long buffer = 0;
     size_t curr_buffsize = 0;
@@ -41,7 +42,8 @@ void write_binary(char *filename, HuffCode *huffman_table, size_t table_size) {
     write_buffer(fout, &buffer, &curr_buffsize);
 
     econio_textcolor(COL_GREEN);
-    printf("%ld bytes\n", file_size(fout));
+    pretty_print(file_size(fout));
+    printf(" bytes\n");
     econio_textcolor(COL_RESET);
 
     fclose(fout);
@@ -60,6 +62,9 @@ void compress(char *filename) {
     HuffCode *huffman_table = build_huffman_table(huffman_tree, table_size);
     quicksort_table(huffman_table, 0, table_size - 1);
 
+    draw_tree(huffman_tree, huffman_table, table_size);
+
+    printf("%s:\t", filename);
     write_binary(filename, huffman_table, table_size);
 
     free(huffman_table);
@@ -75,20 +80,22 @@ void write_text(char *filename, HuffNode *huffman_tree) {
     HuffNode *p = root;
     int chars_to_write = root->freq;
     int chars_written = 0;
-    int buffer_size;
+    int curr_buffsize;
 
     unsigned char buffer;
 
     while (fread(&buffer, sizeof(unsigned char), 1, fin) == 1) {
-        buffer_size = 8;
-        while (buffer_size != 0 && chars_written != chars_to_write) {
+        curr_buffsize = 8;
+        while (curr_buffsize != 0 && chars_written != chars_to_write) {
             int step = buffer / power(2, sizeof(unsigned char) * 8 - 1);
             buffer = buffer << 1;
-            buffer_size -= 1;
-            if (step == 0)
-                p = p->left;
-            else
-                p = p->right;
+            curr_buffsize -= 1;
+            if (!is_leaf(p)) {
+                if (step == 0)
+                    p = p->left;
+                else
+                    p = p->right;
+            }
             if (is_leaf(p)) {
                 fputc(p->c, fout);
                 chars_written += 1;

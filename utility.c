@@ -1,5 +1,6 @@
 #include "utility.h"
 #include "econio.h"
+#include <math.h>
 
 /* copies the filename without the extension */
 void cpy_wo_ext(char *dest, char *filename) {
@@ -139,4 +140,68 @@ int power(int n, int exp) {
         result *= n;
 
     return result;
+}
+
+void pretty_print(long int n) {
+    if (n < 1000) {
+        printf("%ld", n);
+        return;
+    } else {
+        pretty_print(n / 1000);
+        printf(",%03ld", n % 1000);
+    }
+}
+
+int sigbits(unsigned long n) {
+    if (n == 0)
+        return 1;
+    else
+        return (int)log2(n) + 1;
+}
+
+void fprintbin_recur(FILE *f, unsigned long code) {
+    if (code == 0)
+        return;
+    else
+        fprintbin_recur(f, code / 2);
+    fprintf(f, "%lu", code % 2);
+}
+
+
+void fprintbin(FILE *f, unsigned long code, size_t length) {
+    if (length == 0) {
+        fprintf(f, "0");
+        return;
+    }
+    else {
+        for (int i = 0; i < length - sigbits(code); i++)
+            fprintf(f, "0");
+    }
+    if (code == 0)
+        fprintf(f, "0");
+    else
+        fprintbin_recur(f, code);
+}
+
+void fprint_ascii_name(FILE *f, unsigned char c) {
+    fprintf(f, "ASCII%d", c);
+}
+
+void fprint_char(FILE *f, unsigned char c) {
+    if (c > 127) {
+        fputc(c, f);
+        return;
+    }
+    switch(c) {
+        case 9:     fprintf(f, "tab"); break;
+        case 10:    fprintf(f, "%c%cn", 92, 92); break;
+        case 13:    fprintf(f, "%c%cr", 92, 92); break;
+        case 39:    fprintf(f, "%c%c", 92, c); break;
+        case 34:    fprintf(f, "%c%c", 92, c); break;
+        case 60:    fprintf(f, "\\<"); break;
+        case 62:    fprintf(f, "\\>"); break;
+        case 123:   fprintf(f, "%c%c", 92, 123); break;
+        case 125:   fprintf(f, "%c%c", 92, 125); break;
+        default:    fprintf(f, "%c", c); break;
+    }
 }

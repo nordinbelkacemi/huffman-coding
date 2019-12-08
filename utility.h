@@ -21,5 +21,9 @@ bool is_dat(char *filename);
 /* other utility functions */
 int power(int n, int exp);
 void print_usage();
+void pretty_print(long int n);
+void fprintbin(FILE *f, unsigned long code, size_t length);
+void fprint_ascii_name(FILE *f, unsigned char c);
+void fprint_char(FILE *f, unsigned char c);
 
 #endif
