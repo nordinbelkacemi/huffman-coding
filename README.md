@@ -38,5 +38,4 @@ Run the following command to restore the compressed file.
 
 Compressing a text file of the bible, the following huffman tree was generated:
 
-![Alt text](./bible_htree.svg)
 <img src="./bible_htree.svg">
