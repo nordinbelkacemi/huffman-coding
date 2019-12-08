@@ -1,13 +1,13 @@
-# Huffman kódoló specifikáció
+# File compression program using Huffman coding
 
-A program lényegében egy fájltömörítő amely két műveletet tud végezni...
+The program can compress text files, and restore them.
 
-## Tömörítés
+## Compression
 
 **input:** 
-* `example.txt` fájl (eredeti fájl)
+* `example.txt` fájl (original file)
 
-A felhasználó operációs rendszeréhez megfelelő program futtatási parancsot beírhatjuk
+Run the following command to compress the file
 
 |OS| command |
 |--|--|
@@ -15,56 +15,21 @@ A felhasználó operációs rendszeréhez megfelelő program futtatási parancso
 | Windows | `main.exe compress example.txt` |
 
 **output** 
-* `tiny_example.txt` fájl (tömörített fájl)
-* `huffman_example.txt` fájl (kódtáblázat)
+* `tiny_example.dat` file (compressed file)
+* `example_helper.dat` file (helper file containing the huffman table);
 
-## Visszaállítás
-
-Ez a feladat a tömörítés ellentetje, azaz egy tömörített fájt visszaállítunk az eredeti alakjába.
+## Decompression
 
 **input:** 
-* `tiny_example.txt` fájl
-* `huffman_example.txt` fájl
+* `tiny_example.dat` file (compressed file)
+* `huffman_example.txt` file (helper file)
 
-A felhasználó operációs rendszeréhez megfelelő program futtatási parancsot beírhatjuk
+Run the following command to restore the compressed file.
 
 |OS| command |
 |--|--|
-| Mac OS / Linux | `./main decompress tiny_example.txt huffman_example.txt`    |
-| Windows | `main.exe decompress tiny_example.txt huffman_example.txt`    |
+| Mac OS / Linux | `./main restore tiny_example.dat`    |
+| Windows | `main.exe restore tiny_example.dat`    |
 
 **output** 
-* `example.txt` fájl
-
-## Tömörített adatok (Huffman kódolás)
-
-Minden az eredeti fájlban lévö karakterekhez hozzárendel egy egyértelmü huffman kódszót, azaz a tömörített fájlból egy huffman fával (vagy kód táblázattal) egyértelmüen ki lehet olvasni a kódszavakat és rekonstruálni az eredeti kódot.
-
-#### Példa
-
-`example.txt` fájl tartalma:
-```
-aabacdab
-```
-
-`huffman_example.txt` fájl tartalma:
-```
-a: 0
-b: 10
-c: 110
-d: 111
-```
-
-`tiny_example.txt` fájl tartalma:
-```
-00100110111010
-```
-
-A kódtáblázatban levő kódszavak prefix kódot alkotnak, azaz egyik kódszó sem kezdödik egy másikkal.
-
-példa **nem** prefix kódra:
-```
-a: 0
-b: 01
-```
-A `b` kódszó `a`-val kezdödik, vagyis ez nem prefix kód.
+* `example_restored.txt` file (restored file)
