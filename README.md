@@ -5,7 +5,7 @@ The program can compress text files, and restore them.
 ## Compression
 
 **input:** 
-* `example.txt` fájl (original file)
+* `example.txt` file (original file)
 
 Run the following command to compress the file
 
