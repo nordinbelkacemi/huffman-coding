@@ -22,7 +22,7 @@ Run the following command to compress the file
 
 **input:** 
 * `tiny_example.dat` file (compressed file)
-* `huffman_example.txt` file (helper file)
+* `huffman_helper.dat` file (helper file)
 
 Run the following command to restore the compressed file.
 
