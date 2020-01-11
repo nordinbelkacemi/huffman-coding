@@ -23,10 +23,13 @@ big.txt
 huge.txt
 emojis2.txt
 infoc.txt
-
-
-#ignore test files
 pg*.txt
+
+# ignore html
+*.html
+
+# ignore png
+javasciptbad.png
 
 # ignore the junk folder
 junk/
